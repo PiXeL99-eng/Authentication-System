@@ -8,16 +8,27 @@ app.use(express.json());
 
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
+const db = require("./models")
+
+const cors = require('cors');
+app.use(cors())
+
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", 
+        "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 
 const port = 8800 || process.env.PORT;
 
 app.post("/signup", (req, res) => {
-
+    
     const {username, password, name} = req.body
-
+    
     bcrypt.hash(password, 10).then((hashed) => {
-
-        Users.create({
+        
+        db.Users.create({
             name: name,
             username: username,
             password: hashed
@@ -30,13 +41,13 @@ app.post("/signup", (req, res) => {
 })
 
 app.post("/login", async (req, res) => {
-
+    
     const {username, password} = req.body
-
-    const user = await Users.findOne({ where: {username: username}})
-
+    
+    const user = await db.Users.findOne({ where: {username: username}})
+    
     if (! user) return res.status(404).json({error: "User Does Not Exist"})
-
+    
     const isValid = await bcrypt.compare(password, user.password)
 
     if (! isValid) return res.status(404).json({error: "Wrong password"})
@@ -44,35 +55,38 @@ app.post("/login", async (req, res) => {
     // To generate secret key
     // type "node" in a new terminal
     // type "require('crypto').randomBytes(64).toString('hex')"" in the terminal
-
-    const accessToken = jwt.sign({username: user.username, name: user.name}, process.env.SECRET_KEY)  // (payload, secret_key)
-
+    
+    const accessToken = jwt.sign({username: user.username}, process.env.SECRET_KEY)  // (payload, secret_key)
+    
     res.status(200).json({accessToken: accessToken})
 })
 
-app.post("/profile", authenticateToken, (req, res) => {
+app.get("/profile", authenticateToken, async (req, res) => {
 
-    res.status(200).json({username: req.user.username, name: req.user.name})
+    const user = await db.Users.findOne({ where: {username: req.username}})
+    
+    if (! user) return res.status(404).json({error: "User Does Not Exist"})
+    
+    res.status(200).json({username: user.username, name: user.name})
 })
 
-
-// this is a middleware function for /profile 
+// this is the middleware function for /profile 
 function authenticateToken (req, res, next) {
-
+    
     const authHeader = req.headers["authorization"]     // Bearer 'accessToken'
     const accessToken = authHeader && authHeader.split(' ')[1]
-
+    
     if (! accessToken) return res.status(401).json({error: "Missing JWT"})
-
+    
     // (accessToken, secret_key, callback)
     jwt.verify(accessToken, process.env.SECRET_KEY, (err, user) => {
-
+        
         if (err) return res.status(403).json({error: "Invalid JWT"})
-
-        req.user = user
+        
+        req.username = user.username
         next()
     })
-
+    
 }
 
 app.listen(port, () => {
