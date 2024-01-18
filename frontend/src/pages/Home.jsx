@@ -18,8 +18,6 @@ const Home = () => {
           <Stack spacing={4} direction='column' my={"auto"} minWidth={"50%"}>
 
             <Stack direction='column' color="#fffffc" spacing={4}>
-
-              {/* <Avatar bg='#0bc5ea' icon={<AiOutlineUser fontSize='1.5rem' />} /> */}
               <Avatar bg='#0bc5ea' mx={"auto"}/>
               <Heading as='h1' size='xl' textAlign={"center"}>
                 Hi Sayan

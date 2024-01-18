@@ -10,22 +10,33 @@ import {
 
 import { LockIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { useNavigate } from "react-router-dom"
+import { signupCall } from '../api_calls/auth_api'
 
-const Login = () => {
+const Signup = () => {
 
   const [show, setShow] = React.useState(false)
   const handleClick = () => setShow(!show)
   const navigate = useNavigate()
 
+  //set state for fields, error handling modal, fetching button
+
   const handleSubmit = () => {
-    console.log("hey")
+    const data = signupCall()
+
+    if (data.success){
+      navigate("/login", { replace: true })
+    }
+    else{
+      console.log(data.error)
+    }
   }
 
   return (
 
     <>
 
-      <Container maxW="100vw" height="100vh" bg='#14151e'>     
+      <Container maxW="100vw" height="100vh" bg='#14151e'>
+
         <Container maxW="2xl" centerContent height={"100vh"}>
 
           <Stack spacing={4} direction='column' my={"auto"} minWidth={"70%"}>
@@ -34,12 +45,12 @@ const Login = () => {
 
               <LockIcon boxSize={10} color="#0bc5ea" mx={"auto"}/>
               <Heading as='h1' size='xl' textAlign={"center"}>
-                Log in to your account
+                Create an account
               </Heading>
 
               <Text fontSize='md' textAlign={"center"}>
-                Don't have an account? 
-                <Link color='#0bc5ea' _hover={{color: "#00b5d8"}} href='/signup'> Sign up</Link>
+                Already have an account? 
+                <Link color='#0bc5ea' _hover={{color: "#00b5d8"}} href='/login'> Log in</Link>
               </Text>
 
             </Stack>
@@ -47,6 +58,16 @@ const Login = () => {
             <Box paddingY='7' paddingX='8' bg='#171923' borderRadius="10px" color='white' width="100%" boxShadow="0px 0px 7px 0px #868686bd" my="5">
               <form onSubmit={handleSubmit}>
                 <FormControl isRequired marginY={2}>
+                  <FormLabel>Name</FormLabel>
+                  <Input
+                    placeholder="Enter name"
+                    size="md"
+                    type="text"
+                    border="1px solid #4c4c4c"
+                  />
+                </FormControl>
+
+                <FormControl isRequired marginTop={"4"} marginBottom={"0"}>
                   <FormLabel>Email</FormLabel>
                   <Input
                     placeholder="Enter email"
@@ -56,7 +77,7 @@ const Login = () => {
                   />
                 </FormControl>
 
-                <FormControl isRequired marginY='5'>
+                <FormControl isRequired marginY='4'>
                   <FormLabel>Password</FormLabel>
                   <InputGroup size='md'>
                     <Input
@@ -83,7 +104,7 @@ const Login = () => {
                   color="black"
                   marginY="2"
                 >
-                  Login
+                  Sign up
                 </Button>
               </form>
             </Box>
@@ -94,4 +115,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default Signup

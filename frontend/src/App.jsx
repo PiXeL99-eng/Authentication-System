@@ -1,22 +1,18 @@
-import { useState } from 'react'
-import { Home, Signup, Login } from './components';
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+// import { useState } from 'react'
+// import { Home, Signup, Login } from './pages';
+// import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import AuthProvider from "./provider/authProvider";
+import Routes from "./routes";
 
 function App() {
 
   return (
-    <>
-      <Router>
-        {/* <AuthContextProvider> */}
-          <Routes>
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/login" element={<Login />} />
-              <Route exact path="/" element={<Home />} />
-          </Routes>
-        {/* </AuthContextProvider> */}
-      </Router>
-    </>
-  )
+    <AuthProvider>
+      <Routes />
+    </AuthProvider>
+  );
+  
 }
 
 export default App
