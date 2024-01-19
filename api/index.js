@@ -24,16 +24,16 @@ const port = 8800 || process.env.PORT;
 
 app.post("/signup", (req, res) => {
     
-    const {username, password, name} = req.body
+    const {email, password, name} = req.body
     
     bcrypt.hash(password, 10).then((hashed) => {
         
         db.Users.create({
             name: name,
-            username: username,
+            email: email,
             password: hashed
         }).then(() => {
-            res.status(200).json("User registered!")
+            res.status(200).json({})
         }).catch((error) => {
             res.status(500).json({error: error})
         })
@@ -42,9 +42,10 @@ app.post("/signup", (req, res) => {
 
 app.post("/login", async (req, res) => {
     
-    const {username, password} = req.body
+    const {email, password} = req.body
+    console.log(req.body)
     
-    const user = await db.Users.findOne({ where: {username: username}})
+    const user = await db.Users.findOne({ where: {email: email}})
     
     if (! user) return res.status(404).json({error: "User Does Not Exist"})
     
@@ -56,18 +57,18 @@ app.post("/login", async (req, res) => {
     // type "node" in a new terminal
     // type "require('crypto').randomBytes(64).toString('hex')"" in the terminal
     
-    const accessToken = jwt.sign({username: user.username}, process.env.SECRET_KEY)  // (payload, secret_key)
+    const accessToken = jwt.sign({email: user.email}, process.env.SECRET_KEY)  // (payload, secret_key)
     
     res.status(200).json({accessToken: accessToken})
 })
 
 app.get("/profile", authenticateToken, async (req, res) => {
 
-    const user = await db.Users.findOne({ where: {username: req.username}})
+    const user = await db.Users.findOne({ where: {email: req.email}})
     
     if (! user) return res.status(404).json({error: "User Does Not Exist"})
     
-    res.status(200).json({username: user.username, name: user.name})
+    res.status(200).json({email: user.email, name: user.name})
 })
 
 // this is the middleware function for /profile 

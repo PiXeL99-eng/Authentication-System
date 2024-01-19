@@ -1,12 +1,7 @@
-import React from 'react'
+import React, {useState} from 'react'
 import { Input, Container, Box, Stack, Text, Heading, Link } from '@chakra-ui/react'
 import { Button, InputGroup, InputRightElement } from '@chakra-ui/react'
-import {
-  FormControl,
-  FormLabel,
-  FormErrorMessage,
-  FormHelperText,
-} from '@chakra-ui/react'
+import { FormControl, FormLabel, FormErrorMessage, FormHelperText } from '@chakra-ui/react'
 
 import { LockIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { useNavigate } from "react-router-dom"
@@ -16,16 +11,23 @@ import { useAuth } from '../provider/authProvider'
 
 const Login = () => {
 
-  const [show, setShow] = React.useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  const [show, setShow] = useState(false)
   const handleClick = () => setShow(!show)
   const navigate = useNavigate()
   const { setToken } = useAuth()
 
   //set state for fields, error handling modal, fetching button
 
-  const handleSubmit = () => {
-    const data = loginCall()
+  const handleSubmit = async (event) => {
 
+    event.preventDefault();
+    // setIsLoading(true)
+    const data = await loginCall({email, password})
+    // setIsLoading(false)
+    
     if (data.success){
       setToken(data.accessToken)
       navigate("/", { replace: true })
@@ -67,6 +69,7 @@ const Login = () => {
                     size="md"
                     type="email"
                     border="1px solid #4c4c4c"
+                    onChange = {event => setEmail(event.currentTarget.value)}
                   />
                 </FormControl>
 
@@ -78,6 +81,7 @@ const Login = () => {
                       type={show ? 'text' : 'password'}
                       placeholder='Enter password'
                       border="1px solid #4c4c4c"
+                      onChange = {event => setPassword(event.currentTarget.value)}
                     />
                     <InputRightElement width='4.5rem'>
                       <Button h='1.75rem' size='sm' onClick={handleClick} bg={"transparent"} _hover={{ bg: 'transparent' }}>

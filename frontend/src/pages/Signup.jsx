@@ -1,12 +1,7 @@
-import React from 'react'
+import React, {useState} from 'react'
 import { Input, Container, Box, Stack, Text, Heading, Link } from '@chakra-ui/react'
 import { Button, InputGroup, InputRightElement } from '@chakra-ui/react'
-import {
-  FormControl,
-  FormLabel,
-  FormErrorMessage,
-  FormHelperText,
-} from '@chakra-ui/react'
+import { FormControl, FormLabel, FormErrorMessage, FormHelperText } from '@chakra-ui/react'
 
 import { LockIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { useNavigate } from "react-router-dom"
@@ -14,14 +9,22 @@ import { signupCall } from '../api_calls/auth_api'
 
 const Signup = () => {
 
-  const [show, setShow] = React.useState(false)
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  const [show, setShow] = useState(false)
   const handleClick = () => setShow(!show)
   const navigate = useNavigate()
 
   //set state for fields, error handling modal, fetching button
 
-  const handleSubmit = () => {
-    const data = signupCall()
+  const handleSubmit = async (event) => {
+
+    event.preventDefault();
+    // setIsLoading(true)
+    const data = await signupCall({name, email, password})
+    // setIsLoading(false)
 
     if (data.success){
       navigate("/login", { replace: true })
@@ -64,6 +67,7 @@ const Signup = () => {
                     size="md"
                     type="text"
                     border="1px solid #4c4c4c"
+                    onChange = {event => setName(event.currentTarget.value)}
                   />
                 </FormControl>
 
@@ -74,6 +78,7 @@ const Signup = () => {
                     size="md"
                     type="email"
                     border="1px solid #4c4c4c"
+                    onChange = {event => setEmail(event.currentTarget.value)}
                   />
                 </FormControl>
 
@@ -85,6 +90,7 @@ const Signup = () => {
                       type={show ? 'text' : 'password'}
                       placeholder='Enter password'
                       border="1px solid #4c4c4c"
+                      onChange = {event => setPassword(event.currentTarget.value)}
                     />
                     <InputRightElement width='4.5rem'>
                       <Button h='1.75rem' size='sm' onClick={handleClick} bg={"transparent"} _hover={{ bg: 'transparent' }}>
