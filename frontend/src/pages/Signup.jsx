@@ -1,7 +1,15 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 import { Input, Container, Box, Stack, Text, Heading, Link } from '@chakra-ui/react'
 import { Button, InputGroup, InputRightElement } from '@chakra-ui/react'
-import { FormControl, FormLabel, FormErrorMessage, FormHelperText } from '@chakra-ui/react'
+import { FormControl, FormLabel } from '@chakra-ui/react'
+import {
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+} from '@chakra-ui/react'
 
 import { LockIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { useNavigate } from "react-router-dom"
@@ -13,30 +21,49 @@ const Signup = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
+  const [isFetching, setIsFetching] = useState(false)
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const [errorMessage, setErrorMessage] = useState('')
+
   const [show, setShow] = useState(false)
   const handleClick = () => setShow(!show)
   const navigate = useNavigate()
 
-  //set state for fields, error handling modal, fetching button
+  const redirectLogin = () => {
+    onClose()
+    navigate("/login", { replace: true })
+  }
 
   const handleSubmit = async (event) => {
 
-    event.preventDefault();
-    // setIsLoading(true)
-    const data = await signupCall({name, email, password})
-    // setIsLoading(false)
+    setIsFetching(true)
 
-    if (data.success){
-      navigate("/login", { replace: true })
+    event.preventDefault();
+    const data = await signupCall({ name, email, password })
+
+    if (data.success) {
+      onOpen()
+      setErrorMessage("Account Created! Please login.")
     }
-    else{
-      console.log(data.error)
+    else {
+      onOpen()
+      setErrorMessage(data.error)
     }
+
+    setIsFetching(false)
   }
 
   return (
 
     <>
+
+      <Modal isOpen={isOpen} onClose={errorMessage === "Account Created! Please login." ? redirectLogin: onClose}>
+        <ModalOverlay />
+        <ModalContent margin={"6"} borderRadius={"5"} background={"#0bc5ea"}>
+          <ModalHeader padding={"9px 12px"} textAlign={"center"}>{errorMessage}</ModalHeader>
+          <ModalCloseButton/>
+        </ModalContent>
+      </Modal>
 
       <Container maxW="100vw" height="100vh" bg='#14151e'>
 
@@ -46,14 +73,14 @@ const Signup = () => {
 
             <Stack direction='column' color="#fffffc" spacing={4}>
 
-              <LockIcon boxSize={10} color="#0bc5ea" mx={"auto"}/>
+              <LockIcon boxSize={10} color="#0bc5ea" mx={"auto"} />
               <Heading as='h1' size='xl' textAlign={"center"}>
                 Create an account
               </Heading>
 
               <Text fontSize='md' textAlign={"center"}>
-                Already have an account? 
-                <Link color='#0bc5ea' _hover={{color: "#00b5d8"}} href='/login'> Log in</Link>
+                Already have an account?
+                <Link color='#0bc5ea' _hover={{ color: "#00b5d8" }} href='/login'> Log in</Link>
               </Text>
 
             </Stack>
@@ -67,7 +94,7 @@ const Signup = () => {
                     size="md"
                     type="text"
                     border="1px solid #4c4c4c"
-                    onChange = {event => setName(event.currentTarget.value)}
+                    onChange={event => setName(event.currentTarget.value)}
                   />
                 </FormControl>
 
@@ -78,7 +105,7 @@ const Signup = () => {
                     size="md"
                     type="email"
                     border="1px solid #4c4c4c"
-                    onChange = {event => setEmail(event.currentTarget.value)}
+                    onChange={event => setEmail(event.currentTarget.value)}
                   />
                 </FormControl>
 
@@ -90,18 +117,18 @@ const Signup = () => {
                       type={show ? 'text' : 'password'}
                       placeholder='Enter password'
                       border="1px solid #4c4c4c"
-                      onChange = {event => setPassword(event.currentTarget.value)}
+                      onChange={event => setPassword(event.currentTarget.value)}
                     />
                     <InputRightElement width='4.5rem'>
                       <Button h='1.75rem' size='sm' onClick={handleClick} bg={"transparent"} _hover={{ bg: 'transparent' }}>
-                        {show ? <ViewIcon h={"5"} w={"5"} color="#0bc5ea" _hover={{ color: '#00b5d8' }}/> : <ViewOffIcon h={"5"} w={"5"} color="#0bc5ea" _hover={{ color: '#00b5d8' }}/> }
+                        {show ? <ViewIcon h={"5"} w={"5"} color="#0bc5ea" _hover={{ color: '#00b5d8' }} /> : <ViewOffIcon h={"5"} w={"5"} color="#0bc5ea" _hover={{ color: '#00b5d8' }} />}
                       </Button>
                     </InputRightElement>
                   </InputGroup>
                 </FormControl>
 
                 <Button
-                  // isLoading
+                  isLoading={isFetching}
                   loadingText='Loading'
                   colorScheme='cyan'
                   spinnerPlacement='end'

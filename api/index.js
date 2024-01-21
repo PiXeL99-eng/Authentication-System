@@ -22,9 +22,13 @@ app.use(function(req, res, next) {
 
 const port = 8800 || process.env.PORT;
 
-app.post("/signup", (req, res) => {
+app.post("/signup", async (req, res) => {
     
     const {email, password, name} = req.body
+
+    const user = await db.Users.findOne({ where: {email: email}})
+
+    if (user) return res.status(200).json({error: "Email Already Exists"})
     
     bcrypt.hash(password, 10).then((hashed) => {
         
@@ -43,15 +47,14 @@ app.post("/signup", (req, res) => {
 app.post("/login", async (req, res) => {
     
     const {email, password} = req.body
-    console.log(req.body)
     
     const user = await db.Users.findOne({ where: {email: email}})
     
-    if (! user) return res.status(404).json({error: "User Does Not Exist"})
+    if (! user) return res.status(200).json({error: "User Does Not Exist"})
     
     const isValid = await bcrypt.compare(password, user.password)
 
-    if (! isValid) return res.status(404).json({error: "Wrong password"})
+    if (! isValid) return res.status(200).json({error: "Wrong password"})
 
     // To generate secret key
     // type "node" in a new terminal
@@ -66,7 +69,7 @@ app.get("/profile", authenticateToken, async (req, res) => {
 
     const user = await db.Users.findOne({ where: {email: req.email}})
     
-    if (! user) return res.status(404).json({error: "User Does Not Exist"})
+    if (! user) return res.status(200).json({error: "User Does Not Exist"})
     
     res.status(200).json({email: user.email, name: user.name})
 })
@@ -77,14 +80,14 @@ function authenticateToken (req, res, next) {
     const authHeader = req.headers["authorization"]     // Bearer 'accessToken'
     const accessToken = authHeader && authHeader.split(' ')[1]
     
-    if (! accessToken) return res.status(401).json({error: "Missing JWT"})
+    if (! accessToken) return res.status(200).json({error: "Missing JWT"})
     
     // (accessToken, secret_key, callback)
     jwt.verify(accessToken, process.env.SECRET_KEY, (err, user) => {
         
-        if (err) return res.status(403).json({error: "Invalid JWT"})
+        if (err) return res.status(200).json({error: "Invalid JWT"})
         
-        req.username = user.username
+        req.email = user.email
         next()
     })
     

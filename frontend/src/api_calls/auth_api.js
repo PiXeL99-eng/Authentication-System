@@ -5,7 +5,6 @@ export const loginCall = async (userCredentials) => {
     try{
 
         const res = await axios.post(`${import.meta.env.VITE_API_URL}` + "/login", userCredentials);
-        console.log(res.data)
 
         if ('error' in res.data){
             return {success: 0, error: res.data.error}

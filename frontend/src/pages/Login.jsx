@@ -1,7 +1,8 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 import { Input, Container, Box, Stack, Text, Heading, Link } from '@chakra-ui/react'
 import { Button, InputGroup, InputRightElement } from '@chakra-ui/react'
-import { FormControl, FormLabel, FormErrorMessage, FormHelperText } from '@chakra-ui/react'
+import { FormControl, FormLabel } from '@chakra-ui/react'
+import { useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton } from '@chakra-ui/react'
 
 import { LockIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { useNavigate } from "react-router-dom"
@@ -13,49 +14,64 @@ const Login = () => {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [isFetching, setIsFetching] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
 
   const [show, setShow] = useState(false)
+
+  const { isOpen, onOpen, onClose } = useDisclosure()
+
   const handleClick = () => setShow(!show)
   const navigate = useNavigate()
   const { setToken } = useAuth()
 
-  //set state for fields, error handling modal, fetching button
-
   const handleSubmit = async (event) => {
 
+    setIsFetching(true)
+
     event.preventDefault();
-    // setIsLoading(true)
-    const data = await loginCall({email, password})
-    // setIsLoading(false)
-    
-    if (data.success){
+
+    const data = await loginCall({ email, password })
+
+    if (data.success) {
       setToken(data.accessToken)
       navigate("/", { replace: true })
     }
-    else{
-      console.log(data.error)
+    else {
+      onOpen()
+      setErrorMessage(data.error)
     }
+
+    setIsFetching(false)
   }
 
   return (
 
     <>
 
-      <Container maxW="100vw" height="100vh" bg='#14151e'>     
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent margin={"6"} borderRadius={"5"} background={"#0bc5ea"}>
+          <ModalHeader padding={"9px 12px"} textAlign={"center"}>{errorMessage}</ModalHeader>
+          <ModalCloseButton />
+        </ModalContent>
+      </Modal>
+
+      <Container maxW="100vw" height="100vh" bg='#14151e'>
         <Container maxW="2xl" centerContent height={"100vh"}>
 
           <Stack spacing={4} direction='column' my={"auto"} minWidth={"70%"}>
 
             <Stack direction='column' color="#fffffc" spacing={4}>
 
-              <LockIcon boxSize={10} color="#0bc5ea" mx={"auto"}/>
+              <LockIcon boxSize={10} color="#0bc5ea" mx={"auto"} />
               <Heading as='h1' size='xl' textAlign={"center"}>
                 Log in to your account
               </Heading>
 
               <Text fontSize='md' textAlign={"center"}>
-                Don't have an account? 
-                <Link color='#0bc5ea' _hover={{color: "#00b5d8"}} href='/signup'> Sign up</Link>
+                Don't have an account?
+                <Link color='#0bc5ea' _hover={{ color: "#00b5d8" }} href='/signup'> Sign up</Link>
               </Text>
 
             </Stack>
@@ -69,7 +85,7 @@ const Login = () => {
                     size="md"
                     type="email"
                     border="1px solid #4c4c4c"
-                    onChange = {event => setEmail(event.currentTarget.value)}
+                    onChange={event => setEmail(event.currentTarget.value)}
                   />
                 </FormControl>
 
@@ -81,18 +97,18 @@ const Login = () => {
                       type={show ? 'text' : 'password'}
                       placeholder='Enter password'
                       border="1px solid #4c4c4c"
-                      onChange = {event => setPassword(event.currentTarget.value)}
+                      onChange={event => setPassword(event.currentTarget.value)}
                     />
                     <InputRightElement width='4.5rem'>
                       <Button h='1.75rem' size='sm' onClick={handleClick} bg={"transparent"} _hover={{ bg: 'transparent' }}>
-                        {show ? <ViewIcon h={"5"} w={"5"} color="#0bc5ea" _hover={{ color: '#00b5d8' }}/> : <ViewOffIcon h={"5"} w={"5"} color="#0bc5ea" _hover={{ color: '#00b5d8' }}/> }
+                        {show ? <ViewIcon h={"5"} w={"5"} color="#0bc5ea" _hover={{ color: '#00b5d8' }} /> : <ViewOffIcon h={"5"} w={"5"} color="#0bc5ea" _hover={{ color: '#00b5d8' }} />}
                       </Button>
                     </InputRightElement>
                   </InputGroup>
                 </FormControl>
 
                 <Button
-                  // isLoading
+                  isLoading={isFetching}
                   loadingText='Loading'
                   colorScheme='cyan'
                   spinnerPlacement='end'

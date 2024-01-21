@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import { Container, Stack, Heading, Button, Avatar} from '@chakra-ui/react'
 import { useNavigate } from "react-router-dom"
 
@@ -8,15 +8,13 @@ import { useAuth } from '../provider/authProvider'
 const Home = () => {
 
   const { token, setToken } = useAuth()
-  let textName = null;
-  let textUsername = null;
+  const [textDetails, setTextDetails] = useState({});
   
   const getProfileDetails = async () => {
 
-    const {username, name} = await getProfileCall()
+    const {email, name} = await getProfileCall()
 
-    textName = name
-    textUsername = username
+    setTextDetails({email, name})
 
   }
 
@@ -44,11 +42,11 @@ const Home = () => {
 
             <Stack direction='column' color="#fffffc" spacing={4}>
               <Avatar bg='#0bc5ea' mx={"auto"}/>
-              <Heading as='h1' size='xl' textAlign={"center"}>
-                Hi {textName}
+              <Heading as='h2' textAlign={"center"}>
+                Hi {textDetails.name}
               </Heading>
-              <Heading as='h2' size='xl' textAlign={"center"}>
-                Your Email: {textUsername}
+              <Heading as='h2' textAlign={"center"}>
+                Your Email: {textDetails.email}
               </Heading>
 
               <Button
