@@ -2,12 +2,12 @@
 
 A full stack authentication system with a React frontend and Node.js API. Users can log in and sign up in the application. A simple profile page displays User details. User Authentication is done using JSON Web Tokens (JWT). User data is stored securely in a MySQL database.
 
-<!-- ## Video Demo
+## Video Demo
 
 Click on the image below to watch the demo video on Youtube. ⬇
-[![Watch the video](https://img.youtube.com/vi/tS2S6GHAja0/0.jpg)](https://youtu.be/tS2S6GHAja0)
+[![Watch the video](https://img.youtube.com/vi/dPaSdk4rb-4/0.jpg)](https://youtu.be/dPaSdk4rb-4)
 
-## Live Website
+<!-- ## Live Website
 
 To see the app in action, check out the live demo [here](https://chat-app-flame-three.vercel.app/).
 
