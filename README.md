@@ -111,3 +111,7 @@ The project is organized into the following directories:
     ├── api                     # API server codebase
     ├── LICENSE                 # License used
     └── README.md               # Project documentation (you are here!)
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
